@@ -1,0 +1,399 @@
+@import "tailwindcss";
+
+@variant dark (&:is(.dark *));
+
+@theme {
+  /* Deep near-black, faint violet bias */
+  --color-background: oklch(0.055 0.009 288);
+  --color-foreground: oklch(0.93 0.004 288);
+  --color-card: oklch(0.115 0.013 290);
+  --color-muted: oklch(0.19 0.016 290);
+  --color-muted-foreground: oklch(0.6 0.022 290);
+  --color-border: oklch(0.22 0.02 290);
+
+  /* Muted violet accent — dialed back */
+  --color-accent: oklch(0.58 0.15 296);
+  --color-accent-soft: oklch(0.68 0.11 300);
+  --color-accent-deep: oklch(0.42 0.16 294);
+  --color-accent-foreground: oklch(0.98 0 0);
+  --color-ring: oklch(0.58 0.15 296);
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --radius: 0.85rem;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--color-accent) 45%, transparent);
+  color: var(--color-foreground);
+}
+
+/* ------------------------------------------------------------------ */
+/* Animated aurora backdrop — twin violet blooms drifting + breathing  */
+/* ------------------------------------------------------------------ */
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  width: 62vw;
+  height: 62vw;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.16;
+  animation: drift 24s ease-in-out infinite alternate,
+    breathe 9s ease-in-out infinite;
+}
+.aurora::before {
+  background: var(--color-accent);
+  top: -18%;
+  left: -12%;
+}
+.aurora::after {
+  background: var(--color-accent-deep);
+  bottom: -22%;
+  right: -12%;
+  animation-delay: -9s, -4s;
+}
+
+@keyframes drift {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  100% { transform: translate(9vw, 7vh) scale(1.28) rotate(22deg); }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.22; }
+}
+
+/* ------------------------------------------------------------------ */
+/* CRT scanlines + vignette — the "Wired" layer                        */
+/* ------------------------------------------------------------------ */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 1px,
+    color-mix(in oklch, black 55%, transparent) 2px,
+    color-mix(in oklch, var(--color-accent) 12%, transparent) 3px,
+    transparent 4px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.9;
+  animation: scan 6s linear infinite;
+}
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    color-mix(in oklch, var(--color-background) 85%, black) 100%
+  );
+}
+@keyframes scan {
+  0% { background-position-y: 0; }
+  100% { background-position-y: 100px; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Entrance + accent animations                                        */
+/* ------------------------------------------------------------------ */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(30px); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.rise {
+  animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Animated violet gradient sweeping across text */
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.shimmer-text {
+  background: linear-gradient(
+    100deg,
+    oklch(0.99 0 0) 0%,
+    var(--color-accent-soft) 35%,
+    var(--color-accent) 50%,
+    var(--color-accent-soft) 65%,
+    oklch(0.99 0 0) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+
+/* Pulsing halo behind the avatar / accents */
+@keyframes glow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.12);
+  }
+}
+.glow-pulse {
+  animation: glow 4.5s ease-in-out infinite;
+}
+
+/* Slow vertical float */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Terminal-style caret flicker */
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.35; }
+}
+.flicker {
+  animation: flicker 5s linear infinite;
+}
+
+/* Border that traces the card on hover */
+@keyframes borderspin {
+  to { transform: rotate(360deg); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Keygen / demoscene backdrop — static raster lines + a copper bar    */
+/* ------------------------------------------------------------------ */
+.rasters {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 23px,
+    color-mix(in oklch, var(--color-accent) 11%, transparent) 23px 24px
+  );
+  mask-image: radial-gradient(ellipse 95% 75% at 50% 0%, black 8%, transparent 72%);
+  opacity: 0.5;
+}
+
+/* ------------------------------------------------------------------ */
+/* Wired log — sparse NAVI-style system text drifting up in the dark   */
+/* ------------------------------------------------------------------ */
+.wired-log {
+  position: fixed;
+  bottom: 0;
+  left: 1.5rem;
+  z-index: -1;
+  width: 22rem;
+  max-width: 40vw;
+  height: 80vh;
+  overflow: hidden;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--color-accent-soft);
+  opacity: 0.13;
+  mask-image: linear-gradient(to top, transparent 0%, black 22%, black 60%, transparent 100%);
+}
+.wired-log ul {
+  animation: wiredscroll 70s linear infinite;
+}
+@keyframes wiredscroll {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+/* occasional interlace twitch */
+.wired-log li {
+  white-space: nowrap;
+  animation: wiredglitch 9s steps(1) infinite;
+}
+@keyframes wiredglitch {
+  0%, 96%, 100% { opacity: 1; transform: translateX(0); }
+  97% { opacity: 0.4; transform: translateX(2px); }
+  98% { opacity: 1; transform: translateX(-1px); }
+}
+
+/* Scroll-driven trace — fills as you descend, corrupts near the end */
+.wired-trace {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 1.5rem;
+  z-index: -1;
+  width: 24rem;
+  max-width: 42vw;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--color-accent-soft);
+  opacity: 0.16;
+  mask-image: linear-gradient(to top, black 70%, transparent 100%);
+}
+.wired-trace li {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  animation: traceline 0.3s ease both;
+}
+@keyframes traceline {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.wired-trace li.corrupt {
+  color: oklch(0.62 0.21 18);
+  animation: tracecorrupt 0.18s steps(2) infinite;
+}
+@keyframes tracecorrupt {
+  0% { transform: translateX(0) skewX(0deg); }
+  50% { transform: translateX(2px) skewX(-6deg); opacity: 0.7; }
+  100% { transform: translateX(-1px) skewX(3deg); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Card surface: hover lift + violet edge glow                         */
+/* ------------------------------------------------------------------ */
+.card-surface {
+  position: relative;
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+.card-surface:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in oklch, var(--color-accent) 55%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-accent) 30%, transparent),
+    0 18px 50px -20px color-mix(in oklch, var(--color-accent) 65%, transparent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Film grain — lo-fi 2000s / Wired texture                            */
+/* ------------------------------------------------------------------ */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 49;
+  pointer-events: none;
+  opacity: 0.11;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.6s steps(2) infinite;
+}
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-6%, 4%); }
+  100% { transform: translate(4%, -5%); }
+}
+
+/* Phosphor CRT text glow */
+.crt {
+  text-shadow:
+    0 0 4px color-mix(in oklch, var(--color-accent) 55%, transparent),
+    0 0 14px color-mix(in oklch, var(--color-accent) 30%, transparent);
+}
+
+/* Monospace section label, e.g. "// LAYER 02 :: PROJECTS" */
+.layer-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-accent-soft);
+}
+
+/* Box-drawing divider */
+.rule-ascii::before {
+  content: "──────────────────────────────────────────────────────────────────────";
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: color-mix(in oklch, var(--color-accent) 40%, transparent);
+}
+
+/* ------------------------------------------------------------------ */
+/* Connecting-to-the-Wired boot overlay                                */
+/* ------------------------------------------------------------------ */
+.wired-boot {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--color-background);
+  font-family: var(--font-mono);
+  color: var(--color-accent-soft);
+  transition: opacity 0.7s ease, filter 0.7s ease;
+}
+.wired-boot.done {
+  opacity: 0;
+  filter: blur(6px);
+  pointer-events: none;
+}
+.wired-boot .bar {
+  margin-top: 1rem;
+  height: 2px;
+  width: min(280px, 60vw);
+  background: color-mix(in oklch, var(--color-accent) 20%, transparent);
+  overflow: hidden;
+}
+.wired-boot .bar > span {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent);
+  animation: wiredfill 1.7s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+}
+@keyframes wiredfill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+@keyframes bootline {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+::-webkit-scrollbar { width: 9px; }
+::-webkit-scrollbar-track { background: var(--color-background); }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--color-accent) 40%, var(--color-muted));
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
