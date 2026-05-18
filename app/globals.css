@@ -140,19 +140,24 @@ body {
   100% { background-position: 200% 50%; }
 }
 .shimmer-text {
-  background: linear-gradient(
-    100deg,
-    oklch(0.99 0 0) 0%,
-    var(--color-accent-soft) 35%,
-    var(--color-accent) 50%,
-    var(--color-accent-soft) 65%,
-    oklch(0.99 0 0) 100%
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: shimmer 6s linear infinite;
+  color: var(--color-foreground);
+}
+@supports (-webkit-background-clip: text) or (background-clip: text) {
+  .shimmer-text {
+    background: linear-gradient(
+      100deg,
+      var(--color-foreground) 0%,
+      var(--color-accent-soft) 35%,
+      var(--color-accent) 50%,
+      var(--color-accent-soft) 65%,
+      var(--color-foreground) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 6s linear infinite;
+  }
 }
 
 /* Pulsing halo behind the avatar / accents */
